@@ -95,9 +95,3 @@ Failed links are noted at the bottom with the reason.
 
 ---
 
-## Also in This Repo
-
-| File | Description |
-|---|---|
-| [`douyin_link_extractor.js`](./douyin_link_extractor.js) | Main browser console script (this tool) |
-| [`douyin_download_all_video.js`](./douyin_download_all_video.js) | Bulk-extract all video links from a user profile page |

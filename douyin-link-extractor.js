@@ -25,10 +25,6 @@ function inputUrls() {
     .filter(u => u.startsWith("http"));
 }
 
-/**
- * Opens a tiny off-screen popup, waits for the short URL to redirect to
- * www.douyin.com/video/ID (same origin), reads the final URL, then closes the popup.
- */
 async function resolveViaPopup(shortUrl, waitMs = 4000) {
   const win = window.open(
     shortUrl, "_blank",
@@ -46,7 +42,6 @@ async function resolveViaPopup(shortUrl, waitMs = 4000) {
   try {
     finalUrl = win.location.href;
   } catch (e) {
-    // Still on cross-origin — wait a bit longer and retry
     await sleep(2000);
     try { finalUrl = win.location.href; } catch (e2) {}
   }
@@ -104,7 +99,7 @@ function saveFile(content, filename) {
 }
 
 async function run() {
-  const allUrls    = inputUrls();
+  const allUrls = inputUrls();
   if (!allUrls.length) { console.log("No links entered. Exiting."); return; }
 
   const douyinUrls = allUrls.filter(u => u.includes("douyin.com"));
@@ -115,18 +110,15 @@ async function run() {
     console.log(`Skipping ${others.length} non-Douyin link(s): ${others.join(", ")}`);
   console.log("If the browser asks about popups → click ALLOW\n");
 
-  const playUrls = [];
-  const failed   = [];
+  const results = [];  // { id, url }
+  const failed  = [];
 
   for (let i = 0; i < douyinUrls.length; i++) {
     const url = douyinUrls[i];
     console.log(`[${i + 1}/${douyinUrls.length}] ${url}`);
 
     try {
-      // If already a full video URL, extract ID directly
       let awemeId = (url.match(/\/video\/(\d+)/) || [])[1] || null;
-
-      // Otherwise resolve the short URL via popup redirect
       if (!awemeId) awemeId = await resolveViaPopup(url);
       if (!awemeId) throw new Error("Could not resolve video ID");
 
@@ -137,7 +129,7 @@ async function run() {
       if (!playUrl) throw new Error("API returned no video URL");
 
       console.log(`  OK: ${playUrl.slice(0, 80)}...`);
-      playUrls.push(playUrl);
+      results.push({ id: awemeId, url: playUrl });
 
     } catch (e) {
       console.warn(`  FAILED: ${e.message}`);
@@ -147,10 +139,18 @@ async function run() {
     if (i < douyinUrls.length - 1) await sleep(1000);
   }
 
-  const output = [...playUrls, ...(failed.length ? ["", ...failed] : [])].join("\n");
+  const output = [
+    "=== IDs ===",
+    ...results.map(r => r.id),          // Toàn bộ ID trước
+    "",
+    "=== Download URLs ===",
+    ...results.map(r => r.url),         // Toàn bộ URL sau
+    ...(failed.length ? ["", ...failed] : []),
+  ].join("\n");
+
   saveFile(output, "download_links.txt");
 
-  console.log(`\n=== Done: ${playUrls.length}/${douyinUrls.length} succeeded ===`);
+  console.log(`\n=== Done: ${results.length}/${douyinUrls.length} succeeded ===`);
   console.log("Saved: download_links.txt");
 }
 

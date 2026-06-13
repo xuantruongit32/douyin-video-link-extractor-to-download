@@ -1,7 +1,23 @@
+# Douyin Video Link Extractor & Downloader
+
+Extracts direct download links from Douyin videos — supports both **short URLs** and **direct Video IDs**.
+
 ## Requirements
+
 - A modern browser (Chrome, Edge, or Firefox)
 - A Douyin account (logged in — improves success rate significantly)
 - Internet Download Manager (IDM) or any URL-list-based download manager
+
+---
+
+## Scripts
+
+| File | Input | Best for |
+|---|---|---|
+| `douyin-link-extractor.js` | Short URLs (`v.douyin.com/xxxxx`) | Copying links from the app |
+| `douyin_downloader.js` | Video IDs (15–20 digit numbers) | When you already have IDs |
+
+---
 
 ## Usage
 
@@ -11,9 +27,13 @@
 2. Open the browser Developer Tools: press `F12` or `Ctrl + Shift + I`
 3. Click the **Console** tab
 
+---
+
 ### Step 2 — Run the Script
 
-1. Copy the entire contents of [`douyin_link_extractor.js`](./douyin_link_extractor.js)
+#### Option A — From Short URLs (`douyin-link-extractor.js`)
+
+1. Copy the entire contents of [`douyin-link-extractor.js`](./douyin-link-extractor.js)
 2. Paste it into the Console and press **Enter**
 3. A prompt dialog will appear — paste your Douyin links into it, **one link per line**:
 
@@ -25,11 +45,32 @@ https://v.douyin.com/72QbYRyJ1fA
 
 4. Click **OK** to start
 
-### Step 3 — Allow Popups
+#### Option B — From Video IDs (`douyin_downloader.js`)
 
-The script opens a small off-screen popup for each link to follow the redirect. If your browser shows a popup-blocked notification, click **Allow** and run the script again.
+1. Copy the entire contents of [`douyin_downloader.js`](./douyin_downloader.js)
+2. Paste it into the Console and press **Enter**
+3. A prompt dialog will appear — paste your Video IDs, **one per line**:
+
+```
+7361514408332564338
+7385123456789012345
+7391234567890123456
+```
+
+4. Click **OK** to start
+
+> **How to get a Video ID:** It is the 15–20 digit number in a full Douyin URL:
+> `https://www.douyin.com/video/`**`7361514408332564338`**
+
+---
+
+### Step 3 — Allow Popups *(Option A only)*
+
+The short URL script opens a small off-screen popup for each link to follow the redirect. If your browser shows a popup-blocked notification, click **Allow** and run the script again.
 
 > To avoid being asked every time: go to browser **Settings → Privacy & Security → Site Settings → Pop-ups and redirects** → add `douyin.com` to the allowed list.
+
+---
 
 ### Step 4 — Wait and Save
 
@@ -62,14 +103,18 @@ Saved: download_links.txt
 
 ## Output Format
 
-`download_links.txt` contains one direct CDN URL per line, ready for any download manager:
+`download_links.txt` contains all IDs followed by all direct CDN URLs, ready for any download manager:
 
 ```
+=== IDs ===
+7361514408332564338
+7385123456789012345
+
+=== Download URLs ===
 https://v5-hl-mly-ov.zjcdn.com/video1.mp4?...
 https://v5-hl-mly-ov.zjcdn.com/video2.mp4?...
-https://v5-hl-mly-ov.zjcdn.com/video3.mp4?...
 
-# FAILED [2]: https://v.douyin.com/xyz — Could not resolve video ID
+# FAILED [3]: https://v.douyin.com/xyz — Could not resolve video ID
 ```
 
 Failed links are noted at the bottom with the reason.
@@ -82,6 +127,7 @@ Failed links are noted at the bottom with the reason.
 |---|---|---|
 | Douyin short link | `https://v.douyin.com/xxxxx` | ✅ |
 | Douyin full video URL | `https://www.douyin.com/video/123456` | ✅ |
+| Direct Video ID | `7361514408332564338` | ✅ |
 | Kuaishou / other platforms | `https://v.kuaishou.com/xxx` | ❌ |
 
 ---
@@ -90,8 +136,5 @@ Failed links are noted at the bottom with the reason.
 
 - **CDN links expire** — download the videos soon after extracting the links (usually valid for a few hours)
 - **Login required** for private or age-restricted content; public videos may work without login
-- **Rate limiting** — the script adds a 1-second delay between requests to avoid being blocked
+- **Rate limiting** — the script adds a short delay between requests to avoid being blocked
 - Please respect copyright and Douyin's Terms of Service when using downloaded content
-
----
-
